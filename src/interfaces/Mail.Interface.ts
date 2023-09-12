@@ -1,4 +1,4 @@
-export interface MailResponse {
+export interface Mail {
     _id: string
     Message_ID: string
     Date: Date
@@ -20,4 +20,37 @@ export interface MailResponse {
     Content: string
 }
 
-export type MailReceivedResponse = Pick<MailResponse, "_id" | "Date" | "From" | "Subject">
+export type MailReceivedResponse = Pick<Mail, "_id" | "Date" | "From" | "Subject">
+
+
+
+export interface ResponseData<T>  {
+	status: number 
+	msg:    string 
+	data:  T
+}
+
+
+export interface ResponnseHits  {
+	total:  {
+		value: number 
+	} 
+
+	hits:Hit[]
+}
+
+export interface Hit{
+	_index:  string 
+    _id:    string 
+    _source: MailSummary    
+}
+
+
+export interface MailSummary  {
+	To:      string    
+	From:    string    
+	Subject: string    
+	Date:    Date 
+}
+
+
