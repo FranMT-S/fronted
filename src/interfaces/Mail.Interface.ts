@@ -50,7 +50,7 @@ export interface MailSummary  {
 	To:      string    
 	From:    string    
 	Subject: string    
-	Date:    Date 
+	Date:    string 
 }
 
 

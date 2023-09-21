@@ -1,27 +1,28 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-
+import HomeView from '../views/Home/HomeView.vue'
+import {ERouterName} from "@/helpers/enums/RouterName.enum"
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/home',
-    name: 'home',
+    name: ERouterName.HOME,
     redirect:'/home/inbox',
     component: HomeView,
     children:[
       {
         path: 'inbox',
-        name: "inbox",
+        name: ERouterName.INBOX,
+        
         children:[
             {
                 path: '',
-                component: () => import(/* webpackChunkName: "about" */ '../views/InboxView.vue'),
-              
+                name: ERouterName.MAILS,
+                component: () => import(/* webpackChunkName: "about" */ '../views/Inbox/InboxView.vue'),  
             },
             {
                 path: ':id',
-                name:"inboxV",
-                component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
+                name:ERouterName.VIEWMAIL,
+                component: () => import(/* webpackChunkName: "about" */ '../views/Mail/MailView.vue'),
                 props: true 
             }
         ]
@@ -31,22 +32,14 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },
-  {
     path: '/',
     redirect: '/home'
-  }
+  },
 
-  // {
-  //   path: '/:pathMatch(.*)*',
-  //   redirect: '/home'
-  // }
+  {
+    path: '/:pathMatch(.*)',
+    redirect: '/home'
+  }
 ]
 
 const router = createRouter({
