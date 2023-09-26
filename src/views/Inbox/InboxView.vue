@@ -3,7 +3,7 @@
 
 import {  useRoute, useRouter } from 'vue-router'
 
-import { ref,onBeforeMount, onMounted, watch} from 'vue';
+import { ref,onBeforeMount, onMounted, watch,computed} from 'vue';
 import { ERouterName } from '@/helpers/enums/RouterName.enum';
 import { MailService } from '@/services/mail.service';
 import { Hit } from '@/interfaces/Mail.Interface';
@@ -12,9 +12,16 @@ import Pagination from '@/components/Pagination.vue';
 import SearchBar from '@/components/SearchBar.vue';
 
 
+import { ModalsContainer, useModal } from 'vue-final-modal'
+
+import MailViewModal from './modals/MailViewModal.vue'
+
+
+
 const router = useRouter();
 const route = useRoute();
 
+const idModal = ref("")
 const query = ref("");
 const errMsg = ref("");
 const max = 100;
@@ -31,12 +38,14 @@ onBeforeMount(() => {
   page.value = page.value < 1 ? 1 : page.value;
   query.value = route.query['query']?.toString()  || "" ;
 
-  getMails(query.value,page.value * max,max)
+  getMails(query.value,(page.value - 1) * max,max)
 })
 
 onMounted(() => {
  
 })
+
+
 
 
 const getMails = (query:string,from:number,max:number) => {
@@ -53,14 +62,12 @@ const getMails = (query:string,from:number,max:number) => {
     MailService.getAllMails(from,max).then(responseHits)
   .then( hits => Hits.value = hits )
   .catch(catchError)
-  .finally(() => working.value = false);
 }
 
 const findMails = (query:string,from:number,max:number) => {
     MailService.findMails(query,from,max).then(responseHits)
   .then( hits => Hits.value = hits )
   .catch(catchError)
-  .finally(() => working.value = false);
 }
 
 const responseHits = (response) => {
@@ -73,7 +80,7 @@ const responseHits = (response) => {
 
 const catchError = (error) => {
     errMsg.value = error.response.data.error as string
-    console.error('Error al obtener los correos:', error);
+    console.error(error);
 }
 
 const changeQuery = (newQuery:string) => {
@@ -87,20 +94,50 @@ const changePage = (newPage:number) => {
 
 }
 
+const openModal = (id:string) => {
+
+ 
+    const { open, close } = useModal({
+    component: MailViewModal,
+    attrs: {
+      id: id,
+      onConfirm() {
+        close()
+      },
+    },
+    // slots: {
+    //   default: '<p>The content of the modal</p>',
+    // },
+  })
+
+  open()
+}
+
 watch(
       () => route.params,
       (newQuery) => {
         
-        working.value = true;
+        
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-    
             getMails(query.value,(page.value - 1) * max,max)
-          }, 300); 
+          }, 100); 
         },    
       
 )
 
+
+const lastPage = computed(() => {
+  return total.value == 0 ? 1 : total.value % max == 0 ? total.value / max : Math.ceil(total.value / max)
+})
+
+const messageTotalStart = computed(() => {
+  return (page.value - 1) * max < total.value ? (page.value - 1) * max + 1 : total
+})
+
+const messageTotalEnd = computed(() => {
+  return (page.value) * max < total.value ? (page.value) * max : total
+})
 
 watch(
   query,
@@ -133,35 +170,37 @@ watch(
 
 <template>
   <div class="inbox">
-  
-    
- 
 
-    <div class=" text-center  divide-y  rounded">
+    <div class=" text-center  divide-y  rounded ">
 
-      <div class="flex justify-evenly items-end">
+      <div class="flex justify-evenly items-end my-5">
         <div>
           <p class="text-red-500 break-words w-11/12" v-if="errMsg">
             Error: {{ errMsg  }}
           </p>
           <SearchBar :Query="query" @OnQuery="changeQuery"></SearchBar>
+  
         </div>
         <div>
           <div >
             <div>
-              <i class="fa-regular fa-envelope"></i> {{ (page - 1) * max < total ? (page - 1) * max + 1 : total }}-{{ (page) * max < total ? (page) * max : total }} / {{ total }}
+              <i class="fa-regular fa-envelope"></i> {{ messageTotalStart }}-{{ messageTotalEnd }} / {{ total }}
             </div>
             <div>
-              <i class="fa-regular fa-file"></i> {{ page }} / {{ total % max == 0 ? total / max : Math.ceil(total / max) }}
+              <i class="fa-regular fa-file"></i> {{ page }} / {{ lastPage }}
             </div>
           </div>
-          <Pagination :Page="page" @onPage="changePage"></Pagination>
+        
         </div>
       </div>
-      <div>
+      <div >
    
-        <MyTable :working="working" :query="query" class="mb-10" :Hits="Hits"></MyTable>
+        <MyTable :working="false" @OnIDMail="openModal"  :query="query" class="mb-10" :Hits="Hits"></MyTable>
+        <Pagination :Max="lastPage" :Page="page" @onPage="changePage"></Pagination>
+   
+        <ModalsContainer />
       </div>
     </div>
   </div>
+ 
 </template>

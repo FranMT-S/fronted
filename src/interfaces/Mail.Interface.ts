@@ -31,7 +31,7 @@ export interface ResponseData<T>  {
 }
 
 
-export interface ResponnseHits  {
+export interface ResponseHits  {
 	total:  {
 		value: number 
 	} 

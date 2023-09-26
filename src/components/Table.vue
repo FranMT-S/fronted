@@ -20,6 +20,7 @@ const props =  withDefaults(
  
 ) 
 
+const emit = defineEmits(['OnIDMail'])
 
 </script>
 
@@ -68,8 +69,9 @@ const props =  withDefaults(
                         </thead>
                         <tbody class="divide-y ">
                           <tr v-for="(hit, index) in Hits" :key="index " 
-                            class="bg-white even:bg-gray-100 hover:bg-gray-200">
-                              <router-link class="contents"  :to="{name:ERouterName.VIEWMAIL, params:{ id: hit._id}}" >
+                           @click="() => emit(`OnIDMail`,hit._id)"
+                            class="bg-white even:bg-gray-100 hover:bg-gray-200 cursor-pointer">
+                              <!-- <router-link class="contents"  :to="{name:ERouterName.VIEWMAIL, params:{ id: hit._id}}" > -->
                                 <td class=" px-4 py-4 text-sm font-medium ">
                                     <div>
                                         <p class="  text-sm font-normal text-gray-700 ">{{index + 1  }}</p>
@@ -96,7 +98,7 @@ const props =  withDefaults(
                                 <td class="px-4 py-4 text-sm   text-gray-950">
                                   {{  (new Date(hit._source.Date)).toDateString()  }}
                                 </td>
-                                </router-link>
+                                <!-- </router-link> -->
                           </tr>
 
                           <tr>
