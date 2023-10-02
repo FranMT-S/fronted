@@ -2,11 +2,12 @@
 <script setup lang="ts">
 
 
+
 import { Hit } from '@/interfaces/Mail.Interface';
 import { ERouterName } from '@/helpers/enums/RouterName.enum';
 import Spinner from '@/components/Spinner.vue'
-
-
+import { ref } from 'vue';
+import moment from 'moment'
 
 const props =  withDefaults(
                 defineProps<{
@@ -20,28 +21,27 @@ const props =  withDefaults(
  
 ) 
 
-const emit = defineEmits(['OnIDMail'])
+const emit = defineEmits<{
+    (e:'OnIdMail',id:string):void
+}>()
 
 </script>
 
 
 <!-- component -->
 <template>
-<section class="container px-4 mx-auto">
-    <div class="flex flex-col mt-6">
-  
+<section class="container px-4 mx-auto ">
+    <div class="flex flex-col mt-6 shadow-2xl">
         <div 
         :class="{'overflow-x-auto':!working,'overflow-x-hidden':working}"
         class="-mx-4 -my-2  sm:-mx-6 lg:-mx-8 ">
-          
-            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8 ">
-             
+            <div class="inline-block min-w-full py-2 align-middle md:px-6 ">
                 <div class="h-[400px] border md:rounded-lg relative">
                     <div class="absolute w-full h-full bg-gray-800/80" v-if="working">
                         <Spinner class="absolute inset-y-1/2"></Spinner>
                     </div>
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-900 text-white  text-center sticky top-0">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 scale-x-[1.01]  ">
+                        <thead class="main-theme text-white  text-center sticky top-0">
                             <tr>
                               <th scope="col" class=" py-3.5 px-4 text-sm font-normal text-center rtl:text-right ">
                                        No.
@@ -69,8 +69,8 @@ const emit = defineEmits(['OnIDMail'])
                         </thead>
                         <tbody class="divide-y ">
                           <tr v-for="(hit, index) in Hits" :key="index " 
-                           @click="() => emit(`OnIDMail`,hit._id)"
-                            class="bg-white even:bg-gray-100 hover:bg-gray-200 cursor-pointer">
+                           @click="() => emit(`OnIdMail`,hit._id)"
+                            class="bg-white  hover:bg-gray-200 cursor-pointer">
                               <!-- <router-link class="contents"  :to="{name:ERouterName.VIEWMAIL, params:{ id: hit._id}}" > -->
                                 <td class=" px-4 py-4 text-sm font-medium ">
                                     <div>
@@ -96,14 +96,14 @@ const emit = defineEmits(['OnIDMail'])
                                 </td>
           
                                 <td class="px-4 py-4 text-sm   text-gray-950">
-                                  {{  (new Date(hit._source.Date)).toDateString()  }}
+                                  {{ moment(hit._source.Date).format("DD MMM YYYY")    }}
                                 </td>
                                 <!-- </router-link> -->
                           </tr>
 
-                          <tr>
-                            <th colspan="5" v-if="Hits.length == 0 && !working">
-                                No se encontraron coincidencias para la consulta: {{ query }}
+                          <tr class="bg-white  h-[350px] "  v-if="Hits.length == 0 && !working">
+                            <th colspan="6" >
+                                No matches found for the query: {{ query }}
                             </th>
                           </tr>
                         </tbody>
@@ -145,7 +145,6 @@ const emit = defineEmits(['OnIDMail'])
 
 
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 </style>

@@ -8,7 +8,8 @@ const props = withDefaults(
     defineProps<
         {
             Page:number,
-            Max:number
+            Max:number,
+            total:number
         }
     >(),
     {
@@ -16,7 +17,9 @@ const props = withDefaults(
     }
 )
 
-const emit = defineEmits(['OnPage'])
+const emit =  defineEmits<{
+    (e:'OnPage',newPage:number):void
+}>()
 
 const page = ref(props.Page)
 const max = ref(props.Max)
@@ -77,39 +80,53 @@ const indexList = computed(() => {
 <!-- This is an example component -->
 <div>
 
-    <nav class="px-0 py-3">
-        <ul class="inline-flex -space-x-px">
+    <div class="card">
+        <Paginator
+            :template="{
+                '640px': 'FirstPageLink PrevPageLink JumpToPageDropdown NextPageLink LastPageLink',
+                '960px': 'FirstPageLink PrevPageLink JumpToPageDropdown NextPageLink LastPageLink',
+                '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+                default: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown '
+            }"
+            :rows="100"
+            :totalRecords="total">
+        </Paginator>
+    </div>
+
+    <nav class="px-0 py-3 " >
+        
+        <ul class="inline-flex -space-x-px ">
  
             <li>      
                 <a
                    
                     @click="changePage(1)"
-                    class=" cursor-pointer bg-white border border-gray-300 text-gray-500 hover:bg-gray-100 hover:text-gray-700 ml-0 rounded-l-lg leading-tight py-2 px-3 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"> {{ '<<' }}</a>
+                    class=" cursor-pointer bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    ml-0 rounded-l-lg leading-tight py-2 px-3     "> {{ '<<' }}</a>
             </li>
             <li>
                 <a 
                 @click="previousPage"
-                    class=" cursor-pointer bg-white border border-gray-300 text-gray-500 hover:bg-gray-100 hover:text-gray-700 leading-tight py-2 px-3 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">{{ '<' }}</a>
+                    class=" cursor-pointer bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    leading-tight py-2 px-3     ">{{ '<' }}</a>
             </li>
           
             <li>
                 <a 
-                    class="  bg-white border border-gray-300
-                     text-gray-500 
-                     leading-tight py-2 px-3 dark:bg-gray-800 dark:border-gray-700
-                      dark:text-gray-400 ">{{ page }}</a>
+                    class="  bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white
+                      
+                     leading-tight py-2 px-3  
+                       ">{{ page }}</a>
             </li>
      
     
             <li>
                 <a 
                 @click="nextPage"
-                    class=" cursor-pointer bg-white border border-gray-300 text-gray-500 hover:bg-gray-100 hover:text-gray-700 leading-tight py-2 px-3 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">{{ '>' }}</a>
+                    class=" cursor-pointer bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    leading-tight py-2 px-3     ">{{ '>' }}</a>
             </li>
             <li>
                 <a
                 @click="changePage(max)"
-                    class=" cursor-pointer bg-white border  border-gray-300 text-gray-500 hover:bg-gray-100 hover:text-gray-700 rounded-r-lg leading-tight py-2 px-3 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">{{ '>>' }}</a>
+                    class=" cursor-pointer bg-white border  border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    rounded-r-lg leading-tight py-2 px-3     ">{{ '>>' }}</a>
             </li>
   
         </ul>
@@ -119,6 +136,7 @@ const indexList = computed(() => {
     </nav>
 
 
+  
 </div>
 </template>
 

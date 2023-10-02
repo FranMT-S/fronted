@@ -33,10 +33,7 @@ export default defineComponent({
 </template>
 
 <style>
-  .test{
-    color:blue;
-    font-size: 1.5rem;
-  }
+ 
 
 
 </style>

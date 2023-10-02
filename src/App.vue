@@ -5,7 +5,10 @@
 
 <style>
 
-
+.main-theme{
+    background: #490075;
+    background-image: linear-gradient(0.25turn, #490075, #41086a);
+  }
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -37,20 +40,20 @@ nav a.router-link-exact-active {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #a6a6a6b5;
+  background: #a089ec5c;
   border-radius: 10px;
 
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #595959c4;
+  background: #9557b4c4;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #323232;
+  background: #671192c4;
 }
 
 </style>

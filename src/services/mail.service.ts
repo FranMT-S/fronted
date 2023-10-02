@@ -7,7 +7,7 @@ axios.defaults.headers.common['Accept'] = 'application/json';
   export const MailService = {
     async getAllMails(from:number, max:number) {
         return axios
-          .get(`${process.env.VUE_APP_URL_CHI}/mails/from-${from}-max-${max}`)
+          .get(`${process.env.VUE_APP_URL_CHI}/mails/from=${from}&max=${max}`)
     },
 
     async getMail(id:string) {
@@ -16,8 +16,9 @@ axios.defaults.headers.common['Accept'] = 'application/json';
     },
 
     async findMails(terms:string, from:number, max:number) {
+     
         return axios
-          .get(`${process.env.VUE_APP_URL_CHI}/mails/from-${from}-max-${max}-terms-${terms.replaceAll(" ","%20")}`)
+          .get(`${process.env.VUE_APP_URL_CHI}/mails/from=${from}&max=${max}&terms=${encodeURIComponent(terms)}`)
     },
 
   };

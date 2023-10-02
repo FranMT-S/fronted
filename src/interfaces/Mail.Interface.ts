@@ -20,6 +20,10 @@ export interface Mail {
     Content: string
 }
 
+
+export type MailSummary = Pick<Mail, "To" | "From" | "Subject" | "Date">
+export type SubMail = Partial<Mail>
+
 export type MailReceivedResponse = Pick<Mail, "_id" | "Date" | "From" | "Subject">
 
 
@@ -46,11 +50,13 @@ export interface Hit{
 }
 
 
-export interface MailSummary  {
-	To:      string    
-	From:    string    
-	Subject: string    
-	Date:    string 
+
+
+
+export interface ResponseError  {
+	status:      string    
+	msg:    string    
+	error: string    
 }
 
 
