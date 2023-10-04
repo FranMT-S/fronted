@@ -20,7 +20,7 @@ const query = ref(props.Query);
 
 function search(){
   let notValidCharacter:string = ""
-  let validateRegex = /[[<>|!@#$%^~`'";{}]/g
+  let validateRegex = /[[<>|!#$%^~`'";{}]/g
   const matches = Array.from(query.value.matchAll(validateRegex)).map( mach => mach[0])
   
   notValidCharacter = matches.join("")

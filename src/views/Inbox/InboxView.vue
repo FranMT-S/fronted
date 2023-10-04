@@ -149,7 +149,7 @@ const advanceSearch = () =>{
     notContaint.value.trim().split(/\s+/).forEach( word => newQuery += ` -${word}`)
   if(containtAll.value)
     containtAll.value.trim().split(/\s+/).forEach( word => newQuery += ` +${word}`)
-  if(fieldValue.value)
+  if(fieldValue.value && fieldSelect.value)
     newQuery += ` ${fieldSelect.value}:${fieldValue.value.trim()}`
   
   query.value = newQuery
@@ -197,6 +197,15 @@ const messageTotalStart = computed(() => {
 
 const messageTotalEnd = computed(() => {
   return (page.value) * max < total.value ? (page.value) * max : total
+})
+
+const IsInvalidAdvancedSearch = computed(() => {
+  return !(
+      containtSome.value.length > 0 || 
+      notContaint.value.length > 0 || 
+      containtAll.value.length > 0 || 
+      (fieldValue.value.length > 0 && fieldSelect.value.length > 0 )
+  )
 })
 
 
@@ -255,7 +264,9 @@ const messageTotalEnd = computed(() => {
                   
                   
                     <div class="col-span-full flex justify-center">
-                    <button type="submit"  class="px-12 mt-5 border border-purple-800 text-purple-500 rounded-md hover:bg-purple-800 hover:text-white">
+                    <button type="submit" :disabled="IsInvalidAdvancedSearch" 
+                  
+                    class="px-12 mt-5 border disabled:opacity-50 disabled:pointer-events-none border-purple-800 text-purple-500 rounded-md hover:bg-purple-800 hover:text-white">
                     <i class="fa fa-search" aria-hidden="true"></i>  Search
                     </button>
                     </div>

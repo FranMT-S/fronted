@@ -56,7 +56,7 @@ watch(() => props.mailData, (newValue) =>{
           To {{ mail.To }}
         </div>
         <i class="fa fa-angle-down hover:text-gray-800 hover:scale-110 cursor-pointer" aria-hidden="true"  @click="toggle"></i>
-        <OverlayPanel  ref="overlayPanel" class="w-2/5 max-h-96  py-5 overflow-auto">
+        <OverlayPanel  ref="overlayPanel" class="max-w-2xl max-h-96  py-5 overflow-auto">
                <MailDetails :mail-data="mail"></MailDetails>
          
         </OverlayPanel>
