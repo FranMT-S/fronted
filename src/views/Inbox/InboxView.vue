@@ -2,20 +2,21 @@
 <script setup lang="ts">
 
 import {  useRoute, useRouter } from 'vue-router'
+import { ref,onBeforeMount, watch,computed} from 'vue';
 
-import { ref,onBeforeMount, onMounted, watch,computed} from 'vue';
 import { ERouterName } from '@/helpers/enums/RouterName.enum';
 import { MailService } from '@/services/mail.service';
-import { Hit } from '@/interfaces/Mail.Interface';
+import {EnumErrors} from '@/helpers/enums/Errors.enum'
+import { Hit, ResponseData, ResponseHits } from '@/interfaces/Mail.Interface';
+
+import MailViewModal from './modals/MailViewModal.vue'
 import MyTable from '@/components/Table.vue';
 import Pagination from '@/components/Pagination.vue';
 import SearchBar from '@/components/SearchBar.vue';
 
-
 import { ModalsContainer, useModal } from 'vue-final-modal'
+import { AxiosResponse } from 'axios';
 
-import MailViewModal from './modals/MailViewModal.vue'
-import {EnumErrors} from '@/helpers/enums/Errors.enum'
 
 
 const fields =  ["From","To","Subject","Cc","Bcc","X_Folder","X_Origin","X_FileName","Content"]
@@ -39,18 +40,13 @@ const Hits = ref([] as Hit[])
 var debounceTimeout = 0
 
 onBeforeMount(() => {
-  page.value = Number(route.query['page']?.toString()) ;
-  page.value = Number.isNaN(page.value) ? 1 : page.value;
+  page.value = Number(route.query['page']?.toString()) || 1;
   page.value = page.value < 1 ? 1 : page.value;
+
   query.value = route.query['query']?.toString()  || "" ;
 
   getMails(query.value,(page.value - 1) * max,max)
 })
-
-onMounted(() => {
- 
-})
-
 
 
 
@@ -76,7 +72,7 @@ const findMails = (query:string,from:number,max:number) => {
   .catch(catchError)
 }
 
-const responseHits = (response) => {
+const responseHits = (response:AxiosResponse<ResponseData<ResponseHits>, any>) => {
     errMsg.value = ""
   
     total.value = response.data.data.total.value as number
@@ -110,8 +106,7 @@ watch(
         debounceTimeout = setTimeout(() => {
             getMails(query.value,(page.value - 1) * max,max)
           }, 150); 
-        },    
-      
+        },       
 )
 
 watch(
@@ -208,70 +203,57 @@ const IsInvalidAdvancedSearch = computed(() => {
   )
 })
 
-
-
 </script>
 
 
 
 <template>
   <div class="inbox">
-
     <Message class="m-auto p-component p-message p-message-error w-4/6"   @close="errMsg = '' " v-if="errMsg?.length > 0" severity="error">{{errMsg}}</Message>
 
     <div class=" text-center  divide-y  rounded ">
-   
       <div class="flex justify-evenly items-end my-2 py-3 flex-wrap-reverse   w-5/6">
-      
-        <div class=" ">
-         
-          <div class="flex items-center gap-3">
-           
+        <div class=" ">       
+          <div class="flex items-center gap-3">          
             <SearchBar :Query="query" @OnQuery="changeQuery" @OnError="(event:any) => errMsg = event "></SearchBar>
-            <span class="relative" v-tooltip="{ value: 'Advanced search', showDelay: 400 }">
-              
-    
+            <span class="relative" v-tooltip="{ value: 'Advanced search', showDelay: 400 }">   
               <Button @click="toggle"  icon="fa fa-ellipsis-vertical" severity="help" text raised  unstyled  rounded aria-label="Favorite" 
               :class="{'bg-gray-50 scale-110 text-purple-800':activedAdvanceSearch}"
               class="w-12 h-12 text-center   hover:scale-110 text-gray-400 hover:text-purple-800 hover:bg-gray-50 rounded-[100%]"
               />
-              <OverlayPanel @show="activedAdvanceSearch = true" @hide="activedAdvanceSearch = false"  ref="overlayPanel" class="absolute">
-               
+              <OverlayPanel @show="activedAdvanceSearch = true" @hide="activedAdvanceSearch = false"  ref="overlayPanel" class="absolute">           
                 <form @submit.prevent="advanceSearch" >
-
-                
-                    <div class=" p-5 grid-flow-col-dense flex flex-col gap-3  bg-white z-10 " >
+     
+                  <div class=" p-5 grid-flow-col-dense flex flex-col gap-3  bg-white z-10 " >
                     <input type="text" placeholder="Contain some" @keydown="verifyKey"  v-model="containtSome"
-                  class="text-center  border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                      class="text-center  border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
                   
                   
                     <input type="text"  placeholder="Not contain"  @keydown="verifyKey" v-model="notContaint"
-                    class="text-center    border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                      class="text-center border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
                   
 
                     <input type="text"  placeholder="Contain all"  @keydown="verifyKey" v-model="containtAll"
-                    class="text-center    border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                      class="text-center border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
                   
-                  <div class="flex gap-2 flex-wrap md:flex-nowrap  ">
-                      <select  class="flex-grow md:flex-grow-0  border border-gray-400 rounded "  v-model="fieldSelect">
-                        <option value="" class="text-center" >Select Field</option>
-                        <option class="text-center" v-for="(field, index) in fields" :key="index" :value="field">{{ field.replace('_',"-") }}</option>
-                    </select>
-                    <input type="text"  placeholder="Contain"  @keydown="verifyKey" v-model="fieldValue"
-                    class="text-center border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
-                    
-                  </div>
+                    <div class="flex gap-2 flex-wrap md:flex-nowrap  ">
+                        <select  class="flex-grow md:flex-grow-0  border border-gray-400 rounded "  v-model="fieldSelect">
+                          <option value="" class="text-center" >Select Field</option>
+                          <option class="text-center" v-for="(field, index) in fields" :key="index" :value="field">{{ field.replace('_',"-") }}</option>
+                      </select>
+                      <input type="text"  placeholder="Contain"  @keydown="verifyKey" v-model="fieldValue"
+                        class="text-center border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >        
+                    </div>
                   
                   
                     <div class="col-span-full flex justify-center">
                     <button type="submit" :disabled="IsInvalidAdvancedSearch" 
-                  
                     class="px-12 mt-5 border disabled:opacity-50 disabled:pointer-events-none border-purple-800 text-purple-500 rounded-md hover:bg-purple-800 hover:text-white">
                     <i class="fa fa-search" aria-hidden="true"></i>  Search
                     </button>
                     </div>
-                </div>
-               </form>
+                  </div>
+                </form>
               </OverlayPanel>                          
             </span>   
           </div>
@@ -283,13 +265,13 @@ const IsInvalidAdvancedSearch = computed(() => {
       </div>
       <div >
         <div class="container px-4 flex md:justify-end  gap-x-16 mx-5 pt-2 flex-wrap ">
-            <div>
-              <i class="fa-regular fa-envelope" v-tooltip.left="{ value: 'Total messages', showDelay: 300 }"></i> {{ messageTotalStart }}-{{ messageTotalEnd }} / {{ total }}
-            </div>
-            <div>
-              <i class="fa-regular fa-file" v-tooltip.left="{ value: 'Page', showDelay: 300 }"></i> {{ page }} / {{ lastPage }}
-            </div>
+          <div>
+            <i class="fa-regular fa-envelope" v-tooltip.left="{ value: 'Total messages', showDelay: 300 }"></i> {{ messageTotalStart }}-{{ messageTotalEnd }} / {{ total }}
           </div>
+          <div>
+            <i class="fa-regular fa-file" v-tooltip.left="{ value: 'Page', showDelay: 300 }"></i> {{ page }} / {{ lastPage }}
+          </div>
+        </div>
         <MyTable :working="false" @on-id-mail="openModal"  :query="query" class="mb-10" :Hits="Hits"></MyTable>
         <Pagination :Max="lastPage" :Page="page" :total="total" @on-page="changePage"></Pagination>
    
@@ -297,12 +279,8 @@ const IsInvalidAdvancedSearch = computed(() => {
       </div>
     </div>
   </div>
- 
 </template>
 
 <style scoped>
-
 .p-message .p-message-wrapper{ justify-content: center !important;}
- 
-
 </style>

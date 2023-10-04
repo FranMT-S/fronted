@@ -1,10 +1,9 @@
 
 <script setup lang="ts">
 
-const   isExpanded = ref(true);
+  import { ref } from 'vue';
 
-import {withDefaults, defineProps, ref,watch } from 'vue';
-
+  const   isExpanded = ref(true);
 
 </script>
 <template>

@@ -2,36 +2,29 @@
 <script setup lang="ts">
 
 
-import { defineProps, ref ,watch} from 'vue';
-import moment from 'moment'
+  import { defineProps, ref ,watch} from 'vue';
+  import moment from 'moment'
 
-import { SubMail } from '@/interfaces/Mail.Interface';
-import MailDetails from './MailDetails.vue'
+  import { SubMail } from '@/interfaces/Mail.Interface';
+  import MailDetails from './MailDetails.vue'
 
-const props = defineProps<
-    {
-      mailData:SubMail
-    }
-  >()
+  const props = defineProps<{
+                    mailData:SubMail
+                }>()
 
 
   const overlayPanel = ref();
-
   const mail = ref(props.mailData)
 
+  watch(() => props.mailData, (newValue) =>{
+    mail.value = newValue
+  })
 
+  const toggle = (event) => {
+    overlayPanel.value.toggle(event);
+  }
 
-const toggle = (event) => {
-  overlayPanel.value.toggle(event);
-}
-
-
-
-watch(() => props.mailData, (newValue) =>{
-
-  mail.value = newValue
-
-})
+ 
 
 </script>
 
@@ -57,8 +50,7 @@ watch(() => props.mailData, (newValue) =>{
         </div>
         <i class="fa fa-angle-down hover:text-gray-800 hover:scale-110 cursor-pointer" aria-hidden="true"  @click="toggle"></i>
         <OverlayPanel  ref="overlayPanel" class="max-w-2xl max-h-96  py-5 overflow-auto">
-               <MailDetails :mail-data="mail"></MailDetails>
-         
+          <MailDetails :mail-data="mail"></MailDetails>
         </OverlayPanel>
       </div>  
     </section>

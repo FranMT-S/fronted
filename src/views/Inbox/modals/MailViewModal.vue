@@ -2,113 +2,103 @@
 
 <script setup lang="ts">
 
-import { ref,onBeforeMount } from 'vue';
-import { VueFinalModal } from 'vue-final-modal'
+  import { ref,onBeforeMount } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal'
 
-import { Mail,SubMail } from '../../../interfaces/Mail.Interface';
-import { MailService } from '../../../services/mail.service';
+  import { Mail,SubMail } from '../../../interfaces/Mail.Interface';
+  import { MailService } from '../../../services/mail.service';
 
-import Expander from './components/Expander.vue'
-import MailBody from './components/MailBody.vue'
-import MailHeader from './components/MailHeader.vue'
-import moment from 'moment'
-
-const props = defineProps<{
-  id:string
-}>()
+  import Expander from './components/Expander.vue'
+  import MailBody from './components/MailBody.vue'
+  import MailHeader from './components/MailHeader.vue'
 
 
-
-
-
-var mailData = ref({} as Mail)
-var subMessageContent = ref([] as string[])
-const content = ref("")
-const submails = ref([] as SubMail[])
-const firsMessage = ref("")
-
-
-const fromRegex = /\n*From:(?<content>[\t \w\d,.-_]+)/i
-const DateRegex = /\n*Sent:(?<content>[\t \w\d,.-_]+)/i
-const ToRegex = /\n*(To|Re):(?<content>[\t \w\d&,.-_]+)/i
-const SubjectRegex = /\n*Subject:(?<content>[\t \w\d,.-_]+)/i
-const CCRegex = /\n*CC:(?<content>[\t \w\d,.-_]+)/i
-const messageRegex : RegExp = /-----Original Message-----/g;
-
-const emit = defineEmits<{
-    (e: 'confirm'): void
+  const props = defineProps<{
+    id:string
   }>()
 
 
 
-onBeforeMount(  () =>{
- 
-   MailService.getMail(props.id)
-    .then( res => res.data.data)
-    .then( mail =>{
-      mailData.value = mail
 
-      content.value = mail.Content;
-      subMessageContent.value =  content.value.split(messageRegex)
-      firsMessage.value = subMessageContent.value[0]
+
+  const mailData = ref({} as Mail)
+  const subMessageContent = ref([] as string[])
+  const content = ref("")
+  const submails = ref([] as SubMail[])
+  const firsMessage = ref("")
+
+
+  const fromRegex = /\n*From:(?<content>[\t \w\d&,.-_]+)/i
+  const DateRegex = /\n*Sent:(?<content>[\t \w\d,.-_]+)/i
+  const ToRegex = /\n*(To|Re):(?<content>[\t \w\d&,.-_]+)/i
+  const SubjectRegex = /\n*Subject:(?<content>[\t \w\d&,.-_]+)/i
+  const CCRegex = /\n*CC:(?<content>[\t \w\d&,.-_]+)/i
+  const messageRegex : RegExp = /-----Original Message-----/g;
+
+
+
+
+  onBeforeMount(  () =>{
+  
+    MailService.getMail(props.id)
+      .then( res => res.data.data)
+      .then( mail =>{
+        mailData.value = mail
+
+        content.value = mail.Content;
+        subMessageContent.value =  content.value.split(messageRegex)
+        firsMessage.value = subMessageContent.value[0]
+      
     
-  
-      for (let i = 1; i < subMessageContent.value.length; i++) {
-        let _subMail:SubMail = { From: "", To:"", Subject: "", Date: new Date()}
-  
+        for (let i = 1; i < subMessageContent.value.length; i++) {
+          let _subMail:SubMail = { From: "", To:"", Subject: "", Date: new Date()}
+    
+        
+          let match = fromRegex.exec(subMessageContent.value[i])
+          if(match){
+            subMessageContent.value[i] = subMessageContent.value[i].replace(fromRegex,"")
+            _subMail.From = match.groups!['content'].trim() || ""
+          }
       
-        let match = fromRegex.exec(subMessageContent.value[i])
-        if(match){
-          subMessageContent.value[i] = subMessageContent.value[i].replace(fromRegex,"")
-          _subMail.From = match.groups!['content'].trim() || ""
-        }
-     
-        match = DateRegex.exec(subMessageContent.value[i])
-        if(match){
-          subMessageContent.value[i] = subMessageContent.value[i].replace(DateRegex,"")
-          _subMail.Date = new Date(match.groups!['content'].trim()) || ""
-        }
+          match = DateRegex.exec(subMessageContent.value[i])
+          if(match){
+            subMessageContent.value[i] = subMessageContent.value[i].replace(DateRegex,"")
+            _subMail.Date = new Date(match.groups!['content'].trim()) || ""
+          }
 
-        match = ToRegex.exec(subMessageContent.value[i])
-        if(match){
-          subMessageContent.value[i] = subMessageContent.value[i].replace(ToRegex,"")
-          _subMail.To =match.groups!['content'].trim() || ""
-        }
+          match = ToRegex.exec(subMessageContent.value[i])
+          if(match){
+            subMessageContent.value[i] = subMessageContent.value[i].replace(ToRegex,"")
+            _subMail.To =match.groups!['content'].trim() || ""
+          }
 
-        match = CCRegex.exec(subMessageContent.value[i])
-        if(match){
-          subMessageContent.value[i] = subMessageContent.value[i].replace(CCRegex,"")
-          _subMail.Cc =match.groups!['content'].trim() || ""
-        }
+          match = CCRegex.exec(subMessageContent.value[i])
+          if(match){
+            subMessageContent.value[i] = subMessageContent.value[i].replace(CCRegex,"")
+            _subMail.Cc =match.groups!['content'].trim() || ""
+          }
 
-   
+          match = SubjectRegex.exec(subMessageContent.value[i])
+          if(match){
+            subMessageContent.value[i] = subMessageContent.value[i].replace(SubjectRegex,"")
+            _subMail.Subject =match.groups!['content'].trim() || ""
+          }
 
-        match = SubjectRegex.exec(subMessageContent.value[i])
-        if(match){
-          subMessageContent.value[i] = subMessageContent.value[i].replace(SubjectRegex,"")
-          _subMail.Subject =match.groups!['content'].trim() || ""
+          _subMail.Content = subMessageContent.value[i].trim()
+
+    
+          submails.value.push(_subMail)
         }
 
-        _subMail.Content = subMessageContent.value[i].trim()
-
-  
-        submails.value.push(_subMail)
-      }
-
-      
-    })
-    .catch(console.log)
-})
-
-
-
-
-
+        
+      })
+      .catch(console.log)
+  })
 
 </script>
 
-<template>
 
+<template>
   <VueFinalModal
         class="confirm-modal "
         content-class="confirm-modal-content justify-center   absolute inset-0 m-auto h-5/6  w-4/6"
@@ -140,7 +130,6 @@ onBeforeMount(  () =>{
           </div>
         </div>  
       </section>
-   
     </section>
   </VueFinalModal>
 </template>
