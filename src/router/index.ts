@@ -18,12 +18,6 @@ const routes: Array<RouteRecordRaw> = [
                 path: '',
                 name: ERouterName.MAILS,
                 component: () => import(/* webpackChunkName: "about" */ '../views/Inbox/InboxView.vue'),  
-            },
-            {
-                path: ':id',
-                name:ERouterName.VIEWMAIL,
-                component: () => import(/* webpackChunkName: "about" */ '../views/Mail/MailView.vue'),
-                props: true 
             }
         ]
       },

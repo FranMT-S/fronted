@@ -163,25 +163,22 @@ const advanceSearch = () =>{
 }
 
 const verifyKey = (event) =>{
-      var key = event.key;
-      var keyBlock =`.,:";'"()[]{}\`<>''!#$%^&*?+*-/\\=|`;
-
-
-      if (keyBlock.includes(key)) {
-     
-          event.preventDefault();
-}
+  var key = event.key;
+  var keyBlock =`.,:";'"()[]{}\`<>''!#$%^&*?+*-/\\=|`;
+  if (keyBlock.includes(key)) {  
+      event.preventDefault();
+  }
 }
 
 const openModal = (id) => {
-    const { open, close } = useModal({
-    component: MailViewModal,
-    attrs: {
-      id: id,
-      onConfirm() {
-        close()
-      },
+  const { open, close } = useModal({
+  component: MailViewModal,
+  attrs: {
+    id: id,
+    onConfirm() {
+      close()
     },
+  },
   })
 
   open()
@@ -204,15 +201,6 @@ const messageTotalEnd = computed(() => {
 
 
 
-
-// watch(
-//   [query,page],
-//   ([newQuery,newPage]) => {
-//     router.push({name:ERouterName.MAILS,query:{query:newQuery,page:newPage}})
-//   }
-// )
-
-
 </script>
 
 
@@ -224,13 +212,13 @@ const messageTotalEnd = computed(() => {
 
     <div class=" text-center  divide-y  rounded ">
    
-      <div class="flex justify-evenly items-end my-5 py-3 flex-wrap-reverse   w-5/6">
+      <div class="flex justify-evenly items-end my-2 py-3 flex-wrap-reverse   w-5/6">
       
         <div class=" ">
          
           <div class="flex items-center gap-3">
            
-            <SearchBar :Query="query" @OnQuery="changeQuery"></SearchBar>
+            <SearchBar :Query="query" @OnQuery="changeQuery" @OnError="(event:any) => errMsg = event "></SearchBar>
             <span class="relative" v-tooltip="{ value: 'Advanced search', showDelay: 400 }">
               
     
@@ -240,38 +228,39 @@ const messageTotalEnd = computed(() => {
               />
               <OverlayPanel @show="activedAdvanceSearch = true" @hide="activedAdvanceSearch = false"  ref="overlayPanel" class="absolute">
                
-                <div class=" p-5 grid-flow-col-dense flex flex-col gap-3  bg-white z-10 " >
-                <input type="text" placeholder="Contain some" @keydown="verifyKey"  v-model="containtSome"
-               class="text-center  border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
-              
-               
-                <input type="text"  placeholder="Not contain"  @keydown="verifyKey" v-model="notContaint"
-                class="text-center    border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
-              
+                <form @submit.prevent="advanceSearch" >
 
-                <input type="text"  placeholder="Contain all"  @keydown="verifyKey" v-model="containtAll"
-                class="text-center    border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
-              
-               <div class="flex gap-2 flex-wrap md:flex-nowrap  ">
-                   <select  class="flex-grow md:flex-grow-0  border border-gray-400 rounded "  v-model="fieldSelect">
-                     <option value="" class="text-center" >Select Field</option>
-                     <option class="text-center" v-for="(field, index) in fields" :key="index" :value="field">{{ field.replace('_',"-") }}</option>
-                 </select>
-                 <input type="text"  placeholder="Contain"  @keydown="verifyKey" v-model="fieldValue"
-                 class="text-center border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
-                 
-               </div>
-               
-               
-                <div class="col-span-full flex justify-center">
-                 <button @click="advanceSearch" class="px-12 mt-5 border border-purple-800 text-purple-500 rounded-md hover:bg-purple-800 hover:text-white">
-                 <i class="fa fa-search" aria-hidden="true"></i>  Search
-                </button>
+                
+                    <div class=" p-5 grid-flow-col-dense flex flex-col gap-3  bg-white z-10 " >
+                    <input type="text" placeholder="Contain some" @keydown="verifyKey"  v-model="containtSome"
+                  class="text-center  border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                  
+                  
+                    <input type="text"  placeholder="Not contain"  @keydown="verifyKey" v-model="notContaint"
+                    class="text-center    border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                  
+
+                    <input type="text"  placeholder="Contain all"  @keydown="verifyKey" v-model="containtAll"
+                    class="text-center    border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                  
+                  <div class="flex gap-2 flex-wrap md:flex-nowrap  ">
+                      <select  class="flex-grow md:flex-grow-0  border border-gray-400 rounded "  v-model="fieldSelect">
+                        <option value="" class="text-center" >Select Field</option>
+                        <option class="text-center" v-for="(field, index) in fields" :key="index" :value="field">{{ field.replace('_',"-") }}</option>
+                    </select>
+                    <input type="text"  placeholder="Contain"  @keydown="verifyKey" v-model="fieldValue"
+                    class="text-center border border-gray-400 rounded  focus:border-transparent  focus:ring-purple-700 focus:outline-none  focus:ring-2 focus:ring-opacity-40" >
+                    
+                  </div>
+                  
+                  
+                    <div class="col-span-full flex justify-center">
+                    <button type="submit"  class="px-12 mt-5 border border-purple-800 text-purple-500 rounded-md hover:bg-purple-800 hover:text-white">
+                    <i class="fa fa-search" aria-hidden="true"></i>  Search
+                    </button>
+                    </div>
                 </div>
-                 
-      
-              </div>
-            
+               </form>
               </OverlayPanel>                          
             </span>   
           </div>
@@ -301,19 +290,7 @@ const messageTotalEnd = computed(() => {
 </template>
 
 <style scoped>
-/* #adv-search:hover::before{
-  content: "Advance Search";
-  position: absolute;
-  top: -1.3rem;
-  width: 6rem;
-  font-size: 0.7rem;
-  background: #000;
-  color:white;
-  border: solid white;
-  border-radius: 5px;
-  animation: all 1s ease-out;
-  
-} */
+
 .p-message .p-message-wrapper{ justify-content: center !important;}
  
 

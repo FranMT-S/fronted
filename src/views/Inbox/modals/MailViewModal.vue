@@ -30,8 +30,9 @@ const firsMessage = ref("")
 
 const fromRegex = /\n*From:(?<content>[\t \w\d,.-_]+)/i
 const DateRegex = /\n*Sent:(?<content>[\t \w\d,.-_]+)/i
-const ToRegex = /\n*To:(?<content>[\t \w\d,.-_]+)/i
-const Subject = /\n*Subject:(?<content>[\t \w\d,.-_]+)/i
+const ToRegex = /\n*(To|Re):(?<content>[\t \w\d&,.-_]+)/i
+const SubjectRegex = /\n*Subject:(?<content>[\t \w\d,.-_]+)/i
+const CCRegex = /\n*CC:(?<content>[\t \w\d,.-_]+)/i
 const messageRegex : RegExp = /-----Original Message-----/g;
 
 const emit = defineEmits<{
@@ -74,11 +75,17 @@ onBeforeMount(  () =>{
           _subMail.To =match.groups!['content'].trim() || ""
         }
 
+        match = CCRegex.exec(subMessageContent.value[i])
+        if(match){
+          subMessageContent.value[i] = subMessageContent.value[i].replace(CCRegex,"")
+          _subMail.Cc =match.groups!['content'].trim() || ""
+        }
+
    
 
-        match = Subject.exec(subMessageContent.value[i])
+        match = SubjectRegex.exec(subMessageContent.value[i])
         if(match){
-          subMessageContent.value[i] = subMessageContent.value[i].replace(Subject,"")
+          subMessageContent.value[i] = subMessageContent.value[i].replace(SubjectRegex,"")
           _subMail.Subject =match.groups!['content'].trim() || ""
         }
 
@@ -111,11 +118,9 @@ onBeforeMount(  () =>{
     <section class="h-full content-center"> 
       <section class="overflow-auto h-full" >
         <div class="mx-3 h-full ">
-          <div class="  rounded-[5px]  mt-5 h-full" >
-     
-            <section class="">
-        
-              <div 
+          <div class="rounded-[5px]  mt-5 h-full" >
+            <section >
+              <div v-if="mailData"
                 class="items-center mb-5 border  
                 transition-all  duration-400"
               >

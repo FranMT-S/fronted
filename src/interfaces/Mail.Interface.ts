@@ -50,9 +50,6 @@ export interface Hit{
 }
 
 
-
-
-
 export interface ResponseError  {
 	status:      string    
 	msg:    string    

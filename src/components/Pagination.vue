@@ -23,15 +23,7 @@ const emit =  defineEmits<{
 
 const page = ref(props.Page)
 const max = ref(props.Max)
-const activatedPage = ref("text-blue-600 hover:bg-blue-100 hover:text-blue-700 ")
 
-function nextPage(){
-    if (page.value < max.value )  page.value++
-}   
-
-function previousPage(){
-    if (page.value > 1 ) page.value--
-}   
 
 function changePage(newPage:number){
     page.value = newPage
@@ -43,7 +35,6 @@ watch(() => props.Page,(newPage) =>{
 })
 
 watch(() => props.Max,(newPage) =>{
-    
     max.value = newPage
 })
 
@@ -51,98 +42,148 @@ watch(page,(newPage) =>{
     emit('OnPage',newPage)
 })
 
-const indexList = computed(() => {
-    let indexList:number[] = []
-
-    // let count = max.value < 10 ? max.value : 10
-    let count = 5
-
-    if(count > 5 ){
-        for(var i = 1; i <= count; i ++){
-            indexList.push(max.value - 10 + i)
-        }
-    }else{
-        for(var i = 1; i <= count; i ++){
-            indexList.push(i)
-        }
-    }
-
-    return indexList
-
-})
 
 </script>
 
 
 <template>
-<!-- component -->
-<!-- component -->
-<!-- This is an example component -->
-<div>
-
     <div class="card">
-        <Paginator
+        <Paginator class=" py-3"
+            @page="({page}) =>changePage(page + 1)"
+            :first="(page - 1) * 100"
+
             :template="{
-                '640px': 'FirstPageLink PrevPageLink JumpToPageDropdown NextPageLink LastPageLink',
+                '640px': ' PrevPageLink JumpToPageDropdown NextPageLink ',
                 '960px': 'FirstPageLink PrevPageLink JumpToPageDropdown NextPageLink LastPageLink',
                 '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
                 default: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown '
             }"
             :rows="100"
-            :totalRecords="total">
+            :totalRecords="total"
+            :pt="{
+            
+
+                root: {
+                    class: [
+                        'flex items-center justify-center flex-wrap',
+                        'bg-white'
+                    ],
+                    
+                },
+                firstpagebutton: ({ context }) => ({
+                    class: [
+                        'relative inline-flex items-center justify-center user-none overflow-hidden leading-none',
+                        'border-0 text-gray-500  min-w-[3rem] h-12 m-[0.143rem] ',
+                        'transition duration-200',
+                        'text-gray-500 hover:text-black hover:bg-gray-100', //Dark Mode
+                        {
+                            'cursor-default pointer-events-none opacity-60': context.disabled,
+                        }
+                    ]
+                }),
+                previouspagebutton: ({ context }) => ({
+                    class: [
+                        'relative inline-flex items-center justify-center user-none overflow-hidden leading-none',
+                        'border-0 text-gray-500 min-w-[3rem] h-12 m-[0.143rem] ',
+                        'transition duration-200',
+                        'text-gray-500 hover:text-black hover:bg-gray-100', //Dark Mode
+                        {
+                            'cursor-default pointer-events-none opacity-60': context.disabled,
+                        }
+                    ]
+                }),
+                nextpagebutton: ({ context }) => ({
+                    class: [
+                        'relative inline-flex items-center justify-center user-none overflow-hidden leading-none',
+                        'border-0 text-gray-500 min-w-[3rem] h-12 m-[0.143rem] ',
+                        'transition duration-200',
+                        'text-gray-500 hover:text-black hover:bg-gray-100', //Dark Mode
+                        {
+                            'cursor-default pointer-events-none opacity-60': context.disabled,
+                        }
+                    ]
+                }),
+                lastpagebutton: ({ context }) => ({
+                    class: [
+                        'relative inline-flex items-center justify-center user-none overflow-hidden leading-none',
+                        'border-0 text-gray-500 min-w-[3rem] h-12 m-[0.143rem] ',
+                        'transition duration-200',
+                        'text-gray-500 hover:text-black hover:bg-gray-100', //Dark Mode
+                        {
+                            'cursor-default pointer-events-none opacity-60': context.disabled,
+                        }
+                    ]
+                }),
+                pagebutton: ({ context }) => ({
+                    class: [
+                        'relative inline-flex items-center justify-center user-none overflow-hidden leading-none',
+                        'border-0 text-gray-500 min-w-[3rem] h-12 m-[0.143rem] ',
+                        {
+                            'bg-purple-800 border-blue-50 text-blue-700 text-white font-semibold': context.active,
+                            'hover:bg-gray-100 hover:text-gray-800':!context.active
+                        }
+                    ]
+                }),
+                jumptopagedropdown: {
+                    root: ({ props, state }) => ({
+                        class: [
+                            'inline-flex relative cursor-pointer user-none',
+                            'bg-white border rounded-md',
+                            'transition duration-100',
+                            'h-12 mx-2',
+                            {
+                                'outline-none outline-offset-0 shadow-[0_0_0_0.2rem_rgba(91,41,148,0.2)] border-purple-500': state.focused && !props.disabled, //Focus
+                                'border-gray-300': !state.focused,
+                                'hover:border-purple-500': !props.disabled //Hover
+                            }
+                        ]
+                    }),
+                    input: {
+                        class: [
+                            'font-sans text-base text-gray-600 p-3 m-0 rounded-md apperance-none',
+                            'block whitespace-nowrap overflow-hidden flex-auto w-[1%] cursor-pointer text-ellipsis border-0 pr-0',
+                            'focus:outline-none focus:outline-offset-0',
+                            'focus:text-gray-800'
+                        ]
+                    },
+                    trigger:({ props, state }) => ({
+                        class: [
+                            'flex items-center justify-center shrink-0', 
+                            'text-gray-500  w-12 rounded-r-md',
+                            'hover:text-black-800',
+                            {'text-gray-800':state.focused},
+                           
+                        ]
+                    }),
+                    panel: {
+                        class: [
+                      
+                        ]
+                    },
+                    wrapper: 'overflow-auto',
+                    list: 'm-0 p-0 py-3 list-none',
+                    item: ({ context }) => ({
+                        class: [
+                            'relative font-normal cursor-pointer space-nowrap overflow-hidden',
+                            'm-0 py-3 px-5 border-none text-gray-600 rounded-none',
+                            'transition duration-200',
+                            {
+                                'bg-purple-300/40 text-purple-500': context.focused && context.selected,
+                            }
+                        ]
+                    })
+                }
+                
+            }">
+            
         </Paginator>
     </div>
-
-    <nav class="px-0 py-3 " >
-        
-        <ul class="inline-flex -space-x-px ">
- 
-            <li>      
-                <a
-                   
-                    @click="changePage(1)"
-                    class=" cursor-pointer bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    ml-0 rounded-l-lg leading-tight py-2 px-3     "> {{ '<<' }}</a>
-            </li>
-            <li>
-                <a 
-                @click="previousPage"
-                    class=" cursor-pointer bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    leading-tight py-2 px-3     ">{{ '<' }}</a>
-            </li>
-          
-            <li>
-                <a 
-                    class="  bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white
-                      
-                     leading-tight py-2 px-3  
-                       ">{{ page }}</a>
-            </li>
-     
     
-            <li>
-                <a 
-                @click="nextPage"
-                    class=" cursor-pointer bg-white border border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    leading-tight py-2 px-3     ">{{ '>' }}</a>
-            </li>
-            <li>
-                <a
-                @click="changePage(max)"
-                    class=" cursor-pointer bg-white border  border-purple-300 text-purple-800 hover:bg-purple-800 hover:text-white    rounded-r-lg leading-tight py-2 px-3     ">{{ '>>' }}</a>
-            </li>
-  
-        </ul>
-
-      
-        
-    </nav>
-
-
-  
-</div>
 </template>
 
 
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 
 </style>

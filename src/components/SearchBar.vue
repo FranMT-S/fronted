@@ -1,6 +1,7 @@
 
 <script setup lang="ts">
 
+import { EnumErrors } from '@/helpers/enums/Errors.enum';
 import {withDefaults, defineProps, ref,watch } from 'vue';
 
 const props = withDefaults(
@@ -14,11 +15,19 @@ const props = withDefaults(
           }
 )
 
-const emit = defineEmits(['OnQuery'])
+const emit = defineEmits(['OnQuery','OnError'])
 const query = ref(props.Query);
 
 function search(){
-  emit('OnQuery',query.value)
+  let notValidCharacter:string = ""
+  let validateRegex = /[[<>|!@#$%^~`'";{}]/g
+  const matches = Array.from(query.value.matchAll(validateRegex)).map( mach => mach[0])
+  
+  notValidCharacter = matches.join("")
+  if(notValidCharacter.length > 0) 
+    emit('OnError',EnumErrors.NOT_VALID_CHARACTERS + ": " + notValidCharacter)
+  else
+    emit('OnQuery',query.value)
 }
 
 watch( () => props.Query, (newQuery)=> query.value = newQuery)
@@ -28,7 +37,6 @@ watch( () => props.Query, (newQuery)=> query.value = newQuery)
 </script>
 <template>
     
-
 
       <div class="md:flex md:items-center md:justify-between" >
         <div class="relative flex items-center ">

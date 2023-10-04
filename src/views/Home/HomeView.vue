@@ -23,7 +23,7 @@ export default defineComponent({
 
 
 <template>
-  <div class="grid-cols-5 grid w-screen" v-bind:class="[`grid-rows-[${height}_1fr]`]">
+  <div class="grid-cols-5 grid w-screen " v-bind:class="[`grid-rows-[${height}_1fr]`]">
     <div class="col-span-5 row-span-1">
       <NavBar id="navbar" />
     </div>
